@@ -11,7 +11,7 @@
     include("./client/answers.php");
     ?>
     <form action="./server/requests.php" method="post">
-        <input type="hidden" name="question_id" value="<?php echo $qid;?>">
+        <input type="hidden" name="question_id" value="<?php echo $qid; ?>">
         <textarea class="form-control margin-bottom-15" name="answer" placeholder="Your answer..."></textarea>
         <button class="btn btn-primary">Write your answer</button>
     </form>

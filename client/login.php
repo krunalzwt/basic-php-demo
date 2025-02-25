@@ -1,7 +1,7 @@
 <div class="container">
     <h2>Login</h2>
     <form action="./server/requests.php" method="post">
-    <input type="hidden" name="login" value="true">
+        <input type="hidden" name="login" value="true">
         <div class="mb-3">
             <label for="email" class="form-label">Email</label>
             <input type="email" class="form-control" id="email" name="email" aria-describedby="emailHelp">

@@ -1,6 +1,4 @@
 <div class="container mt-4">
-
-
     <div class="row">
         <div class="col-md-8">
             <h1 class="heading text-primary">Questions</h1>
