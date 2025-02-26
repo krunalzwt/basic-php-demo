@@ -57,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
         if ($result) {
             header("location: /discuss");
         } else {
-            echo "Qustion not added!";
+            echo "Question not added!";
         }
     } else if (isset($_POST["answer"])) {
         print_r($_POST);

@@ -2,13 +2,20 @@
     <h1 class="heading text-primary center">Question</h1>
     <?php
     include("./common/db.php");
-    $query = "select * from questions where id=$qid";
+
+    $query = "SELECT questions.*, users.username 
+    FROM questions 
+    JOIN users ON questions.user_id = users.id 
+    WHERE questions.id = $qid";
+    
     $result = $conn->query($query);
     $row = $result->fetch_assoc();
 
+
     // print_r($row);
     echo "<h4 class='question-title'>Question:" . $row['title'] . "</h4>
-        <p>" . $row['description'] . "</p>";
+        <p>" . $row['description'] . "</p>
+        <p>Asked By:".$row['username']."</p>";
     include("./client/answers.php");
     ?>
     <?php
