@@ -9,6 +9,8 @@
                 $query = "select * from questions where category_id=$cid";
             } else if (isset($_GET["search"])) {
                 $query = "select * from questions where `title` LIKE '%$search%' ";
+            } else if (isset($_GET["u-id"])) {
+                $query = "select * from questions where user_id=$uid";
             } else {
                 $query = "select * from questions";
             }
@@ -21,9 +23,13 @@
                 $id = $row['id'];
                 echo "<div class='card mb-3 shadow-sm question-list'>  
                         <div class='card-body'>  
-                            <h4 class='card-title'>
-                                <a href='?q-id=$id'>$title</a>
-                            </h4>  
+                            <h4 class='card-title my-question'>
+                                <a href='?q-id=$id'>$title</a>";
+                if (!empty($uid)) {
+                    echo "<a href='./server/requests.php?delete=$id'>Delete</a>";
+                }
+
+                echo "</h4>  
                         </div>  
                       </div>";
             }

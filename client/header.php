@@ -37,6 +37,7 @@
         <input type="hidden" name="signout" value="true">
         <ul class="nav navbar-nav navbar-right">
           <li><a href="?ask=true">Ask a question</a></li>
+          <li><a href="?u-id=<?php echo $_SESSION['user']['user_id']?>">My Questions</a></li>
           <li><a href="./server/requests.php?logout=true">Logout</a></li>
         </ul>
       <?php } ?>

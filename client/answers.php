@@ -1,13 +1,18 @@
 <div class="container">
     <h5>Answers:</h5>
     <?php
-    $query = "select * from answers where question_id=$qid";
+    $query = "SELECT answers.answer, users.username 
+              FROM answers
+              JOIN users ON answers.user_id = users.id
+              WHERE answers.question_id = $qid";
     $result = $conn->query($query);
-
+    // $username = $_SESSION['user']['username'];
+    
     foreach ($result as $row) {
         $answer = $row['answer'];
+        $username = $row['username'];
         echo "<div>
-        <p class='answer-wrapper'>$answer</p>
+        <p class='answer-wrapper'>$username:$answer</p>
         </div>";
     }
     ?>
