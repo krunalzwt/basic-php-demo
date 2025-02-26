@@ -23,5 +23,4 @@
         echo "<h4>Please <a href='?login=true'>LogIn</a> or <a href='?signup=true'>SignUp</a> to write your own answer...</h4>";
     }
     ?>
-
 </div>
