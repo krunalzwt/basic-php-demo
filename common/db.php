@@ -28,7 +28,7 @@ $create_category_table = "CREATE TABLE IF NOT EXISTS category(
 
 $create_users_table = "CREATE TABLE IF NOT EXISTS users (
     id INT(11) AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(256) NOT NULL,
+    username VARCHAR(256) NOT NULL,
     email VARCHAR(256) NOT NULL UNIQUE,
     password VARCHAR(256) NOT NULL
 )";
