@@ -1,0 +1,3 @@
+-otp based authentication while signup and email change
+-no duplicate username
+-follower following system and list

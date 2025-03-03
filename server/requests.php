@@ -7,19 +7,33 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
         $email = $_POST["email"];
         $password = $_POST["password"];
 
-        $user = $conn->prepare("
-        INSERT INTO users
-        (`username`, `email`, `password`) 
-        VALUES 
-        ('$username','$email','$password')");
+        $query = "SELECT username, email FROM users WHERE username = '$username' OR email = '$email'";
+        $result = $conn->query($query);
 
-        $result = $user->execute();
-        // echo $user->insert_id;
-        if ($result) {
-            $_SESSION["user"] = ["username" => $username, "email" => $email, "user_id" => $user->insert_id];
-            header("location: /discuss");
+        if ($result->num_rows > 0) {
+            while ($row = $result->fetch_assoc()) {
+                if ($row['username'] === $username) {
+                    echo "Error: Username already exists!";
+                }
+                if ($row['email'] === $email) {
+                    echo "Error: Email already exists!";
+                }
+            }
         } else {
-            echo "error creating user!";
+            $user = $conn->prepare("
+            INSERT INTO users
+            (`username`, `email`, `password`) 
+            VALUES 
+            ('$username','$email','$password')");
+
+            $result = $user->execute();
+            // echo $user->insert_id;
+            if ($result) {
+                $_SESSION["user"] = ["username" => $username, "email" => $email, "user_id" => $user->insert_id];
+                header("location: /discuss");
+            } else {
+                echo "error creating user!";
+            }
         }
     } else if (isset($_POST["login"])) {
         $email = $_POST["email"];
@@ -78,27 +92,14 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
         } else {
             echo "Answer not added!";
         }
-    } else if (isset($_POST["editprofile"])) {
-        print_r($_POST);    
-        $username = $_POST["username"];
-        $email = $_POST["email"];
-        $user_id = $_SESSION['user']['user_id'];
-
-        $query = $conn->prepare("
-        UPDATE users SET username=$username,email=$email WHERE id=$user_id");
-
-        $result = $query->execute();
-        // if ($result) {
-        //     header("location: /discuss?edit=$user_id");
-        // } else {
-        //     echo "user not updated!";
-        // }
     }
 }
-
-
-if (isset($_GET["delete"])) {
-    $qid = $_GET['delete'];
+if (isset($_GET["logout"])) {
+    session_unset();
+    header("location: /discuss");
+}
+if(isset($_GET["delete"])) {
+    $qid=$_GET['delete'];
     $user_id = $_SESSION['user']['user_id'];
     $query = $conn->prepare("delete from questions where id='$qid'");
     $result = $query->execute();
