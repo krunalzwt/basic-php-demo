@@ -1,6 +1,6 @@
 <div class="container">
     <h2>Sign Up</h2>
-    <form action="./server/requests.php" method="post">
+    <form action="./server/requests.php" method="post" enctype="multipart/form-data">
         <input type="hidden" name="signup" value="true">
         <div class="mb-3">
             <label for="username" class="form-label">Username</label>
@@ -14,6 +14,10 @@
         <div class="mb-3 margin-bottom-15">
             <label for="password" class="form-label">Password</label>
             <input type="password" class="form-control" name="password" id="password">
+        </div>
+        <div class="mb-3 margin-bottom-15">
+            <label for="picture" class="form-label">Profile Picture</label>
+            <input type="file" class="form-control" name="picture" id="picture">
         </div>
         <button type="submit" class="btn btn-primary">SignUp</button>
     </form>
