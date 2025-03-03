@@ -30,6 +30,12 @@
     } else if (isset($_GET['u-id'])) {
         $uid = $_GET['u-id'];
         include('./client/questions.php');
+    } else if (isset($_GET['profile'])) {
+        $uid = $_GET['profile'];
+        include('./client/myProfile.php');
+    } else if (isset($_GET['edit'])) {
+        $uid = $_GET['edit'];
+        include('./client/editProfile.php');
     } else {
         include('./client/questions.php');
     }

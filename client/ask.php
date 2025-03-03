@@ -4,11 +4,11 @@
         <input type="hidden" name="ask" value="true">
         <div class="mb-3 margin-bottom-15">
             <label for="title" class="form-label">Title</label>
-            <input type="text" class="form-control" id="title" name="title" placeholder="Enter question ">
+            <input type="text" class="form-control" id="title" name="title" placeholder="Enter question... ">
         </div>
         <div class="mb-3 margin-bottom-15">
             <label for="descrription" class="form-label">Descrription</label>
-            <textarea class="form-control" id="descrription" name="description" placeholder="Enter question "></textarea>
+            <textarea class="form-control" id="descrription" name="description" placeholder="Enter question Description... "></textarea>
         </div>
         <div class="mb-3 margin-bottom-15">
             <label for="title" class="form-label">Category</label>
