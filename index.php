@@ -36,6 +36,9 @@
     } else if (isset($_GET['edit'])) {
         // $uid = $_GET['  '];
         include('./client/editProfile.php');
+    } else if (isset($_GET['verify-signup']) && !isset($_SESSION['user']['username'])) {
+        // $uid = $_GET['  '];
+        include('./client/verify-signup.php');
     } else {
         include('./client/questions.php');
     }

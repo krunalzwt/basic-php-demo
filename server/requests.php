@@ -1,14 +1,15 @@
 <?php
 include("../common/db.php");
 session_start();
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+include("./sendMail.php");
+
 if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
     if (isset($_POST["signup"])) {
         $username = $_POST["username"];
         $email = $_POST["email"];
         $password = $_POST["password"];
+
         $hash = password_hash($password, PASSWORD_DEFAULT);
         $profilepicture = $_FILES['picture']['name'];
         $tempname = $_FILES['picture']['tmp_name'];
@@ -16,10 +17,13 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
         $uniqueProfilePicture = time() . '_' . uniqid() . '.' . $ext;
         $folder = '../assets/' . $uniqueProfilePicture;
 
-        move_uploaded_file($tempname, $folder);
+        $otp = rand(100000, 999999);
+        // echo $otp;
+        $_SESSION['otp'] = $otp;
+        $_SESSION['otp_expiry'] = time() + (10 * 60);
+        // print_r($_SESSION);
         $query = "SELECT username, email FROM users WHERE username = '$username' OR email = '$email'";
         $result = $conn->query($query);
-
         if ($result->num_rows > 0) {
             while ($row = $result->fetch_assoc()) {
                 if ($row['username'] === $username) {
@@ -29,20 +33,72 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
                     echo "Error: Email already exists!";
                 }
             }
-        } else {
-            $user = $conn->prepare("
-            INSERT INTO users
-            (`username`, `email`, `password`,`profilepicture`) 
-            VALUES 
-            ('$username','$email','$hash','$uniqueProfilePicture')");
-
-            $result = $user->execute();
-            if ($result) {
-                $_SESSION["user"] = ["username" => $username, "email" => $email, "user_id" => $user->insert_id];
-                header("location: /discuss");
+            exit();
+        }else{
+            if(sendOTP($email, $username, $otp)){
+                header("location: ../?verify-signup");
+                $_SESSION['signup_data'] = ["username" => $username, "email" => $email, "password" => $hash, "profilepicture" => $uniqueProfilePicture];
+                
+                exit();
             } else {
-                echo "error creating user!";
+                echo "Error: OTP could not be sent!";
+                exit();
             }
+        }
+        // header("Location: ./?verify-signup");
+
+
+        // move_uploaded_file($tempname, $folder);
+
+        // } else {
+        //     $user = $conn->prepare("
+        //     INSERT INTO users
+        //     (`username`, `email`, `password`,`profilepicture`) 
+        //     VALUES 
+        //     ('$username','$email','$hash','$uniqueProfilePicture')");
+
+        //     $result = $user->execute();
+        //     if ($result) {
+        //         $_SESSION["user"] = ["username" => $username, "email" => $email, "user_id" => $user->insert_id];
+        //         header("location: /discuss");
+        //     } else {
+        //         echo "error creating user!";
+        //     }
+        // }
+    } else if (isset($_POST['verify-signup'])) {
+        $otpfromuser = $_POST["otp"];
+        if ($_SESSION['otp_expiry'] > time()) {
+            echo "you can do it ";
+
+            $profilepicture = $_FILES['picture']['name'];
+            $tempname = $_FILES['picture']['tmp_name'];
+            $ext = pathinfo($profilepicture, PATHINFO_EXTENSION);
+            $uniqueProfilePicture = time() . '_' . uniqid() . '.' . $ext;
+            $folder = '../assets/' . $uniqueProfilePicture;
+
+            print_r($_SESSION['signup_data']);
+            if ($otpfromuser == $_SESSION['otp']) {
+                $signupdata = $_SESSION['signup_data'];
+                $query = "
+                        INSERT INTO users (`username`, `email`, `password`, `profilepicture`) 
+                        VALUES ('" . $signupdata['username'] . "', '" . $signupdata['email'] . "', '" . $signupdata['password'] . "', '" . $signupdata['profilepicture'] . "')";
+
+                $result = $conn->query($query);
+                if ($result) {
+                  
+                    $_SESSION["user"] = ["username" => $username, "email" => $email, "user_id" => $user->insert_id];
+                     move_uploaded_file($tempname, $folder);
+                    header("location: /discuss");
+                } else {
+                    echo "error creating user!";
+                }
+            } else {
+                echo "otp is not valid";
+                exit();
+            }
+        } else {
+            echo "Session expired!";
+            exit();
         }
     } else if (isset($_POST["login"])) {
         $email = $_POST["email"];
@@ -115,11 +171,11 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
             $ext = pathinfo($profilepicture, PATHINFO_EXTENSION);
             $uniqueProfilePicture = time() . '_' . uniqid() . '.' . $ext;
             $folder = '../assets/' . $uniqueProfilePicture;
-            $query=$conn->prepare('select * from users where id='.$user_id);
+            $query = $conn->prepare('select * from users where id=' . $user_id);
             $query->execute();
-            $result =$query->get_result(); 
-            $row=$result->fetch_assoc();
-            $existingProfilePicture= $row['profilepicture'];
+            $result = $query->get_result();
+            $row = $result->fetch_assoc();
+            $existingProfilePicture = $row['profilepicture'];
 
             if (!empty($existingProfilePicture) && file_exists("../assets/" . $existingProfilePicture)) {
                 unlink("../assets/" . $existingProfilePicture);
@@ -129,7 +185,6 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
                 $_SESSION['user']['profilepicture'] = $uniqueProfilePicture;
                 $query = $conn->prepare("
                 UPDATE users SET username='$username', email='$email', profilepicture='$uniqueProfilePicture' WHERE id='$user_id'");
-                echo "file uploaded!!";
             } else {
                 echo "File upload failed!";
                 exit();
