@@ -1,7 +1,10 @@
 <?php
 include("../common/db.php");
 session_start();
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 if ($_SERVER['REQUEST_METHOD'] == "POST") {
+   
     if (isset($_POST["signup"])) {
         $username = $_POST["username"];
         $email = $_POST["email"];
@@ -92,14 +95,33 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
         } else {
             echo "Answer not added!";
         }
+    } else if ($_POST["editprofile_action"]) {
+        print_r($_POST);
+        
+        $username = $_POST["username"];
+        $email = $_POST["email"];
+        $user_id = $_SESSION['user']['user_id'];
+
+        $query = $conn->prepare("
+        UPDATE users SET username='$username',email='$email' WHERE id='$user_id'");
+
+        $result = $query->execute();
+        if ($result) {
+            $_SESSION['user']['username'] = $username;
+            $_SESSION['user']['email'] = $email;
+            echo "profile updated!!";
+            header("location: /discuss?edit=$user_id");
+        } else {
+            echo "user not updated!";
+        }
     }
 }
 if (isset($_GET["logout"])) {
     session_unset();
     header("location: /discuss");
 }
-if(isset($_GET["delete"])) {
-    $qid=$_GET['delete'];
+if (isset($_GET["delete"])) {
+    $qid = $_GET['delete'];
     $user_id = $_SESSION['user']['user_id'];
     $query = $conn->prepare("delete from questions where id='$qid'");
     $result = $query->execute();

@@ -13,7 +13,7 @@
         <div class="mb-3 margin-bottom-15">
             <label for="title" class="form-label">Category</label>
             <?php
-            include("./client/category.php");
+            include("./client/category.php"); 
             ?>
         </div>
         <button type="submit" name="ask" class="btn btn-primary">Ask Question</button>

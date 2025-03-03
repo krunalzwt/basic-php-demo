@@ -34,7 +34,7 @@
         $uid = $_GET['profile'];
         include('./client/myProfile.php');
     } else if (isset($_GET['edit'])) {
-        $uid = $_GET['edit'];
+        // $uid = $_GET['  '];
         include('./client/editProfile.php');
     } else {
         include('./client/questions.php');
