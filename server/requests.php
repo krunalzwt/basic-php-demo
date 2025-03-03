@@ -4,11 +4,13 @@ session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 if ($_SERVER['REQUEST_METHOD'] == "POST") {
-   
+
     if (isset($_POST["signup"])) {
         $username = $_POST["username"];
         $email = $_POST["email"];
         $password = $_POST["password"];
+        $hash = password_hash($password, PASSWORD_DEFAULT);
+
 
         $query = "SELECT username, email FROM users WHERE username = '$username' OR email = '$email'";
         $result = $conn->query($query);
@@ -27,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
             INSERT INTO users
             (`username`, `email`, `password`) 
             VALUES 
-            ('$username','$email','$password')");
+            ('$username','$email','$hash')");
 
             $result = $user->execute();
             // echo $user->insert_id;
@@ -43,18 +45,22 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
         $password = $_POST["password"];
         $username = "";
         $user_id = 0;
-        $query = "select * from users where email='$email' and password='$password'";
+
+        $query = "select * from users where email='$email'";
         $result = $conn->query($query);
         if ($result->num_rows == 1) {
-            foreach ($result as $row) {
+            $row = $result->fetch_assoc(); 
+    
+            if (password_verify($password, $row['password'])) {
                 $username = $row['username'];
                 $user_id = $row['id'];
+        
+                $_SESSION["user"] = ["username" => $username, "email" => $email, "user_id" => $user_id];
+                header("location: /discuss");
+                exit(); 
+            } else {
+                echo "Invalid Credentials!!";
             }
-            echo $username;
-            $_SESSION["user"] = ["username" => $username, "email" => $email, "user_id" => $user_id];
-            header("location: /discuss");
-        } else {
-            echo "Invalid Credentials!!";
         }
     } else if (isset($_POST["ask"])) {
 
@@ -97,7 +103,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
         }
     } else if ($_POST["editprofile_action"]) {
         print_r($_POST);
-        
+
         $username = $_POST["username"];
         $email = $_POST["email"];
         $user_id = $_SESSION['user']['user_id'];
