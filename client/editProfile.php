@@ -25,7 +25,12 @@
             include('./common/db.php');
             $res = mysqli_query($conn, "SELECT profilepicture FROM users WHERE id=" . $_SESSION['user']['user_id']);
             $row = mysqli_fetch_assoc($res);
-            $profilePicture = $row['profilepicture'];
+            // $profilePicture = $row['profilepicture'];
+            if (empty($row['profilepicture'])) {
+                $profilePicture = 'profile.svg';
+            } else {
+                $profilePicture = $row['profilepicture'];
+            }
             ?>
             <img src="./assets/<?php echo $profilePicture; ?>" alt="Profile Picture">
         </div>
