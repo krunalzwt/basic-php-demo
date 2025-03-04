@@ -170,11 +170,24 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
         if ($result) {
             $_SESSION['user']['username'] = $username;
             $_SESSION['user']['email'] = $email;
-            header("location: /discuss?edit=$user_id");
+            header("location: /discuss?profile=$user_id");
         } else {
             echo "User not updated!";
         }
+    }else if(isset($_POST["delete"])){
+        print_r($_SESSION);
+        $id = $_SESSION["user"]["user_id"];
+        
+        if ($id) { 
+            $query = $conn->prepare("DELETE FROM users WHERE id = $id");
+            $query->execute();
+            session_unset();  
+            header("location: /discuss");  
+        } else {
+            echo "User ID not found in session.";
+        }
     }
+    
 }
 if (isset($_GET["logout"])) {
     session_unset();
