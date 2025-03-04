@@ -18,10 +18,9 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
         $folder = '../assets/' . $uniqueProfilePicture;
 
         $otp = rand(100000, 999999);
-        // echo $otp;
         $_SESSION['otp'] = $otp;
         $_SESSION['otp_expiry'] = time() + (10 * 60);
-        // print_r($_SESSION);
+        
         $query = "SELECT username, email FROM users WHERE username = '$username' OR email = '$email'";
         $result = $conn->query($query);
         if ($result->num_rows > 0) {
@@ -34,63 +33,36 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
                 }
             }
             exit();
-        }else{
-            if(sendOTP($email, $username, $otp)){
+        } else {
+            if (sendOTP($email, $username, $otp)) {
                 header("location: ../?verify-signup");
                 $_SESSION['signup_data'] = ["username" => $username, "email" => $email, "password" => $hash, "profilepicture" => $uniqueProfilePicture];
-                
+                move_uploaded_file($tempname, $folder);
                 exit();
             } else {
                 echo "Error: OTP could not be sent!";
                 exit();
             }
         }
-        // header("Location: ./?verify-signup");
-
-
-        // move_uploaded_file($tempname, $folder);
-
-        // } else {
-        //     $user = $conn->prepare("
-        //     INSERT INTO users
-        //     (`username`, `email`, `password`,`profilepicture`) 
-        //     VALUES 
-        //     ('$username','$email','$hash','$uniqueProfilePicture')");
-
-        //     $result = $user->execute();
-        //     if ($result) {
-        //         $_SESSION["user"] = ["username" => $username, "email" => $email, "user_id" => $user->insert_id];
-        //         header("location: /discuss");
-        //     } else {
-        //         echo "error creating user!";
-        //     }
-        // }
     } else if (isset($_POST['verify-signup'])) {
         $otpfromuser = $_POST["otp"];
         if ($_SESSION['otp_expiry'] > time()) {
-            echo "you can do it ";
-
-            $profilepicture = $_FILES['picture']['name'];
-            $tempname = $_FILES['picture']['tmp_name'];
-            $ext = pathinfo($profilepicture, PATHINFO_EXTENSION);
-            $uniqueProfilePicture = time() . '_' . uniqid() . '.' . $ext;
-            $folder = '../assets/' . $uniqueProfilePicture;
-
-            print_r($_SESSION['signup_data']);
             if ($otpfromuser == $_SESSION['otp']) {
                 $signupdata = $_SESSION['signup_data'];
+                $folder = '../assets/' . $signupdata['profilepicture'];
                 $query = "
-                        INSERT INTO users (`username`, `email`, `password`, `profilepicture`) 
-                        VALUES ('" . $signupdata['username'] . "', '" . $signupdata['email'] . "', '" . $signupdata['password'] . "', '" . $signupdata['profilepicture'] . "')";
+                INSERT INTO users (`username`, `email`, `password`, `profilepicture`) 
+                VALUES ('" . $signupdata['username'] . "', '" . $signupdata['email'] . "', '" . $signupdata['password'] . "', '" . $signupdata['profilepicture'] . "')";
 
                 $result = $conn->query($query);
                 if ($result) {
-                  
-                    $_SESSION["user"] = ["username" => $username, "email" => $email, "user_id" => $user->insert_id];
-                     move_uploaded_file($tempname, $folder);
+
+                    $_SESSION["user"] = [ "username" => $signupdata['username'],  "email"=>$signupdata['email'],"user_id" => $conn->insert_id];
+
                     header("location: /discuss");
                 } else {
                     echo "error creating user!";
+                    unlink($folder);
                 }
             } else {
                 echo "otp is not valid";
