@@ -32,7 +32,7 @@ function sendOTP ($email,$username,$otp) {
         $mail->Port       = 587;                                    //TCP port to connect to; use 587 if you have set `SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS`
 
         //Recipients
-        $mail->setFrom('silveroakgaming.18@gmail.com', 'Discuss');
+        $mail->setFrom(getenv('SMTP_USER'), 'Discuss');
         $mail->addAddress($email, $username);     //Add a recipient
 
         //Content
